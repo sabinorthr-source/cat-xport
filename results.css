@@ -1,0 +1,297 @@
+
+:root {
+  font-family: Arial, Helvetica, sans-serif;
+  color: #202124;
+  background: #f7f8fa;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  padding: 24px;
+}
+
+.topbar,
+.section-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.topbar {
+  flex-wrap: wrap;
+  margin-bottom: 22px;
+}
+
+h1 {
+  margin: 0;
+  font-size: 23px;
+}
+
+h2 {
+  margin: 0;
+  font-size: 17px;
+}
+
+h3 {
+  margin: 0;
+  font-size: 15px;
+}
+
+section {
+  margin-bottom: 28px;
+}
+
+.section-heading {
+  margin-bottom: 12px;
+}
+
+.record-count {
+  color: #6b7280;
+  font-size: 13px;
+  white-space: nowrap;
+}
+
+.actions {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.button {
+  padding: 9px 13px;
+  border: 1px solid transparent;
+  border-radius: 6px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.primary {
+  background: #d9273e;
+  color: white;
+}
+
+.secondary {
+  background: white;
+  border-color: #d1d5db;
+  color: #30343b;
+}
+
+button:disabled {
+  opacity: .5;
+  cursor: not-allowed;
+}
+
+.status {
+  min-height: 16px;
+  margin: 0 0 12px;
+  color: #6b7280;
+  font-size: 12px;
+}
+
+.table-wrap {
+  overflow: auto;
+  max-height: 52vh;
+  border: 1px solid #e1e4e8;
+  border-radius: 8px;
+  background: white;
+}
+
+table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  text-align: left;
+  font-size: 13px;
+}
+
+th,
+td {
+  padding: 11px 13px;
+  border-right: 1px solid #e9ebee;
+  border-bottom: 1px solid #e9ebee;
+  white-space: nowrap;
+}
+
+th {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  background: #eef1f4;
+  font-weight: 650;
+}
+
+tbody tr:nth-child(even) {
+  background: #fafbfc;
+}
+
+tbody tr:hover {
+  background: #f2f5f9;
+}
+
+td:last-child,
+th:last-child {
+  border-right: 0;
+}
+
+.compare-section {
+  padding: 18px;
+  border: 1px solid #e1e4e8;
+  border-radius: 9px;
+  background: white;
+}
+
+.compare-section .section-heading {
+  margin-bottom: 12px;
+}
+
+textarea {
+  display: block;
+  width: 100%;
+  min-height: 92px;
+  padding: 11px;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  font: 13px/1.5 monospace;
+  resize: vertical;
+}
+
+textarea:focus {
+  outline: 2px solid #93c5fd;
+  outline-offset: 1px;
+}
+
+.compare-actions {
+  margin-top: 10px;
+  margin-bottom: 18px;
+}
+
+.result-heading {
+  padding-top: 4px;
+}
+
+.comparison-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.result-card {
+  min-width: 0;
+  overflow: hidden;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  background: white;
+}
+
+.result-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 11px 13px;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.missing-header {
+  background: #51a2ff;
+  color: #10243a;
+}
+
+.matched-header {
+  background: #05df72;
+  color: #073b23;
+}
+
+.icon-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 30px;
+  height: 30px;
+  padding: 6px;
+  border: 1px solid rgb(0 0 0 / 12%);
+  border-radius: 6px;
+  background: rgb(255 255 255 / 65%);
+  color: #202124;
+  cursor: pointer;
+}
+
+.icon-button:hover {
+  background: white;
+}
+
+.icon-button svg {
+  width: 18px;
+  height: 18px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.id-output {
+  min-height: 65px;
+  max-height: 280px;
+  overflow: auto;
+  margin: 0;
+  padding: 13px;
+  color: #30343b;
+  background: #fff;
+  font: 13px/1.7 ui-monospace, SFMono-Regular, Consolas, monospace;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+footer {
+  margin-top: 18px;
+  color: #9ca3af;
+  font-size: 11px;
+}
+
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+[hidden] {
+  display: none !important;
+}
+
+@media (max-width: 700px) {
+  body {
+    padding: 14px;
+  }
+
+  .topbar {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .section-heading {
+    align-items: flex-start;
+  }
+
+  .comparison-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .compare-section {
+    padding: 12px;
+  }
+}

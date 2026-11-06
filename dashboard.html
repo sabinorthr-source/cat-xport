@@ -1,0 +1,208 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>PedidosYa Catalog Export</title>
+  <link rel="stylesheet" href="dashboard.css">
+  <script src="vendor/xlsx.full.min.js"></script>
+  <script src="dashboard.js" defer></script>
+</head>
+<body>
+  <div class="app">
+    <aside class="sidebar">
+      <div class="brand">
+        <span class="brand-mark">PY</span>
+        <div>
+          <strong>Catalog Export</strong>
+          <small>Gestión de catálogos</small>
+        </div>
+      </div>
+
+      <nav aria-label="Secciones del dashboard">
+        <button class="nav-item active" data-view="backoffice">
+          <svg class="nav-icon" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M8 8h8M8 12h8M8 16h5"/></svg> BackOffice
+        </button>
+        <button class="nav-item" data-view="vendor">
+          <svg class="nav-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 21h18M5 21V7l7-4 7 4v14M9 10h1m4 0h1M9 14h1m4 0h1M10 21v-4h4v4"/></svg> Vendor
+        </button>
+        <button class="nav-item" data-view="comparison">
+          <svg class="nav-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M8 7h12M8 12h12M8 17h12M3 7h.01M3 12h.01M3 17h.01"/><path d="m4 4 1 1 2-2M4 9l1 1 2-2M4 14l1 1 2-2"/></svg> Comparativa
+        </button>
+      </nav>
+
+      <div class="sidebar-footer">
+        Procesamiento local
+      </div>
+    </aside>
+
+    <main class="main">
+      <header class="page-header">
+        <div>
+          <p class="eyebrow">PEDIDOSYA / DATA TOOLS</p>
+          <h1 id="page-title">BackOffice</h1>
+          <p id="page-description">
+            Registros extraídos del catálogo.
+          </p>
+        </div>
+        <span class="local-badge">Local</span>
+      </header>
+
+      <p id="status" class="status" role="status" aria-live="polite">
+        Cargando registros...
+      </p>
+
+      <section id="backoffice-view" class="view">
+        <div class="section-heading">
+          <div>
+            <h2>Catálogo de BackOffice</h2>
+            <p>Marca, identificador del local y tienda.</p>
+          </div>
+          <span id="backoffice-count" class="count">0 registros</span>
+        </div>
+
+        <div class="toolbar">
+          <button class="button secondary" data-copy="backoffice">
+            Copiar tabla
+          </button>
+          <button class="button primary" data-export="backoffice">
+            Exportar XLSX
+          </button>
+        </div>
+
+        <div class="table-wrap">
+          <table id="backoffice-table">
+            <thead>
+              <tr>
+                <th>Marca</th>
+                <th>ID Local</th>
+                <th>Tienda</th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </div>
+
+        <section class="manual-compare" aria-labelledby="manual-compare-title">
+          <div class="section-heading">
+            <div>
+              <h2 id="manual-compare-title">Comparar IDs introducidos manualmente</h2>
+              <p>La Lista A se obtiene automáticamente de la columna ID Local. Pega en Comparar los IDs que quieres verificar.</p>
+            </div>
+          </div>
+          <div class="manual-input-grid single-input">
+            <div>
+              <label class="field-label" for="manual-ids-b">Comparar — pega la lista de IDs</label>
+              <textarea id="manual-ids-b" rows="6" placeholder='["1234", "1235", 1236]'></textarea>
+            </div>
+          </div>
+          <div class="toolbar manual-toolbar">
+            <button id="compare-manual-ids" class="button primary" type="button">Comparar listas</button>
+            <button id="clear-manual-ids" class="button secondary" type="button">Limpiar</button>
+          </div>
+          <div id="manual-compare-summary" class="manual-summary" role="status" aria-live="polite"></div>
+          <div class="json-results-grid">
+            <section class="json-result">
+              <div class="json-result-heading"><h3>Coincidencias</h3><button class="button secondary" data-copy-json="matches">Copiar JSON</button></div>
+              <textarea id="json-matches" rows="8" readonly spellcheck="false">[]</textarea>
+            </section>
+            <section class="json-result">
+              <div class="json-result-heading"><h3>Faltantes</h3><button class="button secondary" data-copy-json="missingA">Copiar JSON</button></div>
+              <textarea id="json-missing-a" rows="8" readonly spellcheck="false">[]</textarea>
+            </section>
+          </div>
+        </section>
+      </section>
+
+      <section id="vendor-view" class="view" hidden>
+        <div class="section-heading">
+          <div>
+            <h2>Integraciones de Vendor</h2>
+            <p>Datos de la cadena seleccionada, recopilados mediante la paginación visible.</p>
+          </div>
+          <span id="vendor-count" class="count">0 registros</span>
+        </div>
+
+        <p id="vendor-meta" class="meta"></p>
+
+        <div class="toolbar">
+          <button class="button secondary" data-copy="vendor">
+            Copiar tabla
+          </button>
+          <button class="button primary" data-export="vendor">
+            Exportar XLSX
+          </button>
+        </div>
+
+        <div class="table-wrap">
+          <table id="vendor-table">
+            <thead>
+              <tr>
+                <th>Vendor Name</th>
+                <th>Chain ID</th>
+                <th>Remote ID</th>
+                <th>Integration</th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </div>
+      </section>
+
+      <section id="comparison-view" class="view" hidden>
+        <div class="section-heading">
+          <div>
+            <h2>Comparativa de tiendas</h2>
+            <p>BackOffice como base; Vendor como fuente complementaria.</p>
+          </div>
+          <span id="comparison-count" class="count">0 registros</span>
+        </div>
+
+        <div id="comparison-summary" class="summary-grid">
+          <div class="summary-card">
+            <span>Coincidencias únicas</span>
+            <strong id="matched-count">0</strong>
+          </div>
+          <div class="summary-card">
+            <span>Sin coincidencia</span>
+            <strong id="missing-count">0</strong>
+          </div>
+          <div class="summary-card">
+            <span>Coincidencias ambiguas</span>
+            <strong id="ambiguous-count">0</strong>
+          </div>
+        </div>
+
+        <div class="toolbar">
+          <button class="button secondary" data-copy="comparison">
+            Copiar tabla
+          </button>
+          <button class="button primary" data-export="comparison">
+            Exportar XLSX
+          </button>
+        </div>
+
+        <div class="table-wrap">
+          <table id="comparison-table">
+            <thead>
+              <tr>
+                <th>Marca</th>
+                <th>ID Local</th>
+                <th>Tienda</th>
+                <th>Remote ID</th>
+                <th>Chain ID</th>
+                <th>Integration</th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </div>
+
+        <p class="footnote">
+          Las coincidencias ambiguas no se asignan automáticamente.
+        </p>
+      </section>
+    </main>
+  </div>
+</body>
+</html>

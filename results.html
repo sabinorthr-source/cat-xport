@@ -1,0 +1,118 @@
+
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Catálogo de PedidosYa</title>
+  <link rel="stylesheet" href="results.css">
+  <script src="vendor/xlsx.full.min.js"></script>
+  <script src="results.js" defer></script>
+</head>
+
+<body>
+  <header class="topbar">
+    <h1>Catálogo de PedidosYa</h1>
+
+    <div class="actions">
+      <button id="copy" class="button secondary">Copiar tabla</button>
+      <button id="xlsx" class="button primary">Exportar Excel (.xlsx)</button>
+    </div>
+  </header>
+
+  <p id="status" class="status" role="status" aria-live="polite"></p>
+
+  <main>
+    <section aria-labelledby="catalog-title">
+      <div class="section-heading">
+        <h2 id="catalog-title">Registros extraídos</h2>
+        <span id="summary" class="record-count">0 registros encontrados</span>
+      </div>
+
+      <div class="table-wrap">
+        <table id="catalog-table">
+          <thead>
+            <tr>
+              <th>Marca</th>
+              <th>ID Local</th>
+              <th>Tienda</th>
+            </tr>
+          </thead>
+          <tbody id="rows"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="compare-section" aria-labelledby="compare-title">
+      <div class="section-heading">
+        <h2 id="compare-title">Comparar platformVendors</h2>
+      </div>
+
+      <label class="visually-hidden" for="platform-input">
+        IDs para comparar
+      </label>
+
+      <textarea
+        id="platform-input"
+        rows="4"
+        spellcheck="false"
+        placeholder='Pega los IDs o platformVendors...'
+      ></textarea>
+
+      <div class="actions compare-actions">
+        <button id="compare" class="button primary">Comparar</button>
+        <button id="clear-compare" class="button secondary">Limpiar</button>
+      </div>
+
+      <div id="compare-results" hidden>
+        <div class="section-heading result-heading">
+          <h3>Resultados</h3>
+          <span id="compare-summary" class="record-count"></span>
+        </div>
+
+        <div class="comparison-grid">
+          <div class="result-card">
+            <div class="result-header missing-header">
+              <span>ID Local faltante</span>
+              <button
+                id="copy-missing"
+                class="icon-button"
+                type="button"
+                aria-label="Copiar IDs faltantes"
+                title="Copiar IDs faltantes"
+              >
+                <svg viewBox="0 0 24 24" aria-hidden="true">
+                  <rect x="8" y="8" width="12" height="12" rx="2"></rect>
+                  <path d="M16 8V5a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h3"></path>
+                </svg>
+              </button>
+            </div>
+            <pre id="missing-ids" class="id-output"></pre>
+          </div>
+
+          <div class="result-card">
+            <div class="result-header matched-header">
+              <span>ID Local coincidente</span>
+              <button
+                id="copy-matched"
+                class="icon-button"
+                type="button"
+                aria-label="Copiar IDs coincidentes"
+                title="Copiar IDs coincidentes"
+              >
+                <svg viewBox="0 0 24 24" aria-hidden="true">
+                  <rect x="8" y="8" width="12" height="12" rx="2"></rect>
+                  <path d="M16 8V5a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h3"></path>
+                </svg>
+              </button>
+            </div>
+            <pre id="matched-ids" class="id-output"></pre>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer>Procesamiento local</footer>
+</body>
+</html>
