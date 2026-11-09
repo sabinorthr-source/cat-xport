@@ -21,13 +21,13 @@
 
       <nav aria-label="Secciones del dashboard">
         <button class="nav-item active" data-view="backoffice">
-          <svg class="nav-icon" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M8 8h8M8 12h8M8 16h5"/></svg> BackOffice
+          <svg class="nav-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M11 21.73a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73z"/><path d="M12 22V12"/><polyline points="3.29 7 12 12 20.71 7"/><path d="m7.5 4.27 9 5.15"/></svg> BackOffice
         </button>
         <button class="nav-item" data-view="vendor">
-          <svg class="nav-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 21h18M5 21V7l7-4 7 4v14M9 10h1m4 0h1M9 14h1m4 0h1M10 21v-4h4v4"/></svg> Vendor
+          <svg class="nav-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 22a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h8a2.4 2.4 0 0 1 1.704.706l3.588 3.588A2.4 2.4 0 0 1 20 8v12a2 2 0 0 1-2 2z"/><path d="M14 2v5a1 1 0 0 0 1 1h5"/><path d="M8 13h2"/><path d="M14 13h2"/><path d="M8 17h2"/><path d="M14 17h2"/></svg> Vendor
         </button>
         <button class="nav-item" data-view="comparison">
-          <svg class="nav-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M8 7h12M8 12h12M8 17h12M3 7h.01M3 12h.01M3 17h.01"/><path d="m4 4 1 1 2-2M4 9l1 1 2-2M4 14l1 1 2-2"/></svg> Comparativa
+          <svg class="nav-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M14 2v5a1 1 0 001 1h5"/><path d="M14.692 22H18a2 2 0 002-2V8a2.4 2.4 0 00-.706-1.706l-3.588-3.588A2.4 2.4 0 0014 2H6a2 2 0 00-2 2v3.804"/><path d="M2.264 13.752 7 16.5l4.737-2.748"/><path d="M2.995 13.014A2 2 0 002 14.744v3.516a2 2 0 00.996 1.73l3 1.74a2 2 0 002.008 0l3-1.74A2 2 0 0012 18.26v-3.517a2 2 0 00-.995-1.73l-3-1.742a2 2 0 00-1.892-.064z"/><path d="M7 16.5V22"/></svg> Comparativa
         </button>
       </nav>
 
@@ -56,18 +56,16 @@
         <div class="section-heading">
           <div>
             <h2>Catálogo de BackOffice</h2>
-            <p>Marca, identificador del local y tienda.</p>
+            <span id="backoffice-count" class="count">0 registros</span>
           </div>
-          <span id="backoffice-count" class="count">0 registros</span>
-        </div>
-
-        <div class="toolbar">
-          <button class="button secondary" data-copy="backoffice">
-            Copiar tabla
-          </button>
-          <button class="button primary" data-export="backoffice">
-            Exportar XLSX
-          </button>
+          <div class="toolbar">
+            <button class="button secondary" data-copy="backoffice">
+              Copiar tabla
+            </button>
+            <button class="button excel" data-export="backoffice">
+              Exportar XLSX
+            </button>
+          </div>
         </div>
 
         <div class="table-wrap">
@@ -86,13 +84,12 @@
         <section class="manual-compare" aria-labelledby="manual-compare-title">
           <div class="section-heading">
             <div>
-              <h2 id="manual-compare-title">Comparar IDs introducidos manualmente</h2>
-              <p>La Lista A se obtiene automáticamente de la columna ID Local. Pega en Comparar los IDs que quieres verificar.</p>
+              <h2 id="manual-compare-title">Comparar IDs</h2>
             </div>
           </div>
           <div class="manual-input-grid single-input">
             <div>
-              <label class="field-label" for="manual-ids-b">Comparar — pega la lista de IDs</label>
+              <label class="field-label" for="manual-ids-b">Pega la lista de IDs</label>
               <textarea id="manual-ids-b" rows="6" placeholder='["1234", "1235", 1236]'></textarea>
             </div>
           </div>
@@ -102,11 +99,11 @@
           </div>
           <div id="manual-compare-summary" class="manual-summary" role="status" aria-live="polite"></div>
           <div class="json-results-grid">
-            <section class="json-result">
+            <section class="json-result panelc">
               <div class="json-result-heading"><h3>Coincidencias</h3><button class="button secondary" data-copy-json="matches">Copiar JSON</button></div>
               <textarea id="json-matches" rows="8" readonly spellcheck="false">[]</textarea>
             </section>
-            <section class="json-result">
+            <section class="json-result panelf">
               <div class="json-result-heading"><h3>Faltantes</h3><button class="button secondary" data-copy-json="missingA">Copiar JSON</button></div>
               <textarea id="json-missing-a" rows="8" readonly spellcheck="false">[]</textarea>
             </section>
@@ -118,21 +115,19 @@
         <div class="section-heading">
           <div>
             <h2>Integraciones de Vendor</h2>
-            <p>Datos de la cadena seleccionada, recopilados mediante la paginación visible.</p>
+            <span id="vendor-count" class="count">0 registros</span>
           </div>
-          <span id="vendor-count" class="count">0 registros</span>
+          <div class="toolbar">
+            <button class="button secondary" data-copy="vendor">
+              Copiar tabla
+            </button>
+            <button class="button excel" data-export="vendor">
+              Exportar XLSX
+            </button>
+          </div>
         </div>
 
         <p id="vendor-meta" class="meta"></p>
-
-        <div class="toolbar">
-          <button class="button secondary" data-copy="vendor">
-            Copiar tabla
-          </button>
-          <button class="button primary" data-export="vendor">
-            Exportar XLSX
-          </button>
-        </div>
 
         <div class="table-wrap">
           <table id="vendor-table">
@@ -153,7 +148,6 @@
         <div class="section-heading">
           <div>
             <h2>Comparativa de tiendas</h2>
-            <p>BackOffice como base; Vendor como fuente complementaria.</p>
           </div>
           <span id="comparison-count" class="count">0 registros</span>
         </div>
@@ -177,7 +171,7 @@
           <button class="button secondary" data-copy="comparison">
             Copiar tabla
           </button>
-          <button class="button primary" data-export="comparison">
+          <button class="button excel" data-export="comparison">
             Exportar XLSX
           </button>
         </div>

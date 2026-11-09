@@ -92,7 +92,6 @@ nav {
   stroke-width: 1.8;
   stroke-linecap: round;
   stroke-linejoin: round;
-  color: #aeb7c9;
 }
 
 .nav-item:hover {
@@ -104,9 +103,6 @@ nav {
   color: white;
 }
 
-.nav-item.active .nav-icon {
-  color: #ffb4bd;
-}
 
 .sidebar-footer {
   margin-top: auto;
@@ -212,6 +208,15 @@ h2 {
 .nav-item:focus-visible {
   outline: 2px solid #6099ff;
   outline-offset: 2px;
+}
+
+.button.excel {
+  background: #00c950;
+  color: #fff;
+}
+
+.button.excel:hover {
+  background: #00a63e;
 }
 
 .button.primary {
@@ -416,12 +421,12 @@ tbody tr:last-child td {
 .manual-input-grid,
 .json-results-grid {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-template-columns: repeat(1, minmax(0, 1fr));
   gap: 14px;
 }
 
 .json-results-grid {
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   margin-top: 14px;
 }
 
@@ -431,6 +436,14 @@ tbody tr:last-child td {
   border: 1px solid #e1e6ee;
   border-radius: 9px;
   background: #fff;
+}
+
+.panelc {
+  background: #eef2f7;
+}
+
+.panelf {
+  background: #ffdf20;
 }
 
 .json-result-heading {
@@ -448,7 +461,7 @@ tbody tr:last-child td {
 
 .json-result textarea {
   min-height: 170px;
-  background: #f8fafc;
+  background: #fff;
   font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
   font-size: 12px;
   white-space: pre;
