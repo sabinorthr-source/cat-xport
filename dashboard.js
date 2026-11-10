@@ -12,7 +12,7 @@ const state = {
 const definitions = {
   backoffice: {
     title: "BackOffice",
-    description: "Registros extraídos del catálogo y comparación manual de IDs.",
+    description: "",
     storageKey: "backofficeRecords",
     columns: [
       { key: "brand", label: "Marca" },
@@ -24,7 +24,7 @@ const definitions = {
   },
   vendor: {
     title: "Vendor",
-    description: "Registros extraídos recorriendo la paginación visible de Vendor.",
+    description: "",
     storageKey: "vendorRecords",
     columns: [
       { key: "vendorName", label: "Vendor Name" },
@@ -37,7 +37,7 @@ const definitions = {
   },
   comparison: {
     title: "Comparativa",
-    description: "Cruce de tiendas de BackOffice con Vendors.",
+    description: "",
     columns: [
       { key: "brand", label: "Marca" },
       { key: "localId", label: "ID Local" },
@@ -52,6 +52,15 @@ const definitions = {
 };
 
 let activeView = "backoffice";
+let comparisonBusy = false;
+let lastComparisonInput = null;
+let manualComparisonResult = null;
+
+const resultLabels = {
+  matches: "coincidencias",
+  missing: "nos-faltan",
+  extra: "nos-sobran"
+};
 
 function getRecords(view) {
   if (view === "comparison") return state.comparison;
@@ -194,22 +203,18 @@ function buildComparison() {
 }
 
 function compareManualIds() {
+  if (comparisonBusy) return;
+  comparisonBusy = true;
+  $("#compare-manual-ids").disabled = true;
+
   const result = IdComparator.compareIdLists({
     backofficeRecords: state.backoffice,
     manualInput: $("#manual-ids-b").value,
-    manualEmptyConfirmed: $("#confirm-empty-manual-ids").checked,
     backofficeStatus: state.backofficeStatus
   });
 
-  $("#json-matches").value = result.executed
-    ? JSON.stringify(result.matches, null, 2)
-    : "[]";
-  $("#json-missing-a").value = result.executed
-    ? JSON.stringify(result.missing, null, 2)
-    : "[]";
-  $("#json-extra").value = result.executed
-    ? JSON.stringify(result.extra, null, 2)
-    : "[]";
+  manualComparisonResult = result;
+  renderManualComparison(result);
 
   const { backoffice, manual } = result.metrics;
   const metricsText =
@@ -221,11 +226,133 @@ function compareManualIds() {
     ? ` · ${result.metrics.matches} coincidencias · ` +
       `${result.metrics.missing} nos faltan · ${result.metrics.extra} nos sobran`
     : ` · Comparación bloqueada: ${result.reason}`;
-
   $("#manual-compare-summary").textContent =
     `${result.status}${result.partial ? " (PARCIAL)" : ""} · ` +
-    `${metricsText}${resultText} ` +
-    `${result.warnings.map(({ message }) => `[Aviso: ${message}]`).join(" ")}`;
+    `${metricsText}${resultText}`;
+
+  lastComparisonInput = {
+    manualInput: $("#manual-ids-b").value,
+    backofficeStatus: state.backofficeStatus
+  };
+  comparisonBusy = false;
+  $("#compare-manual-ids").disabled = false;
+}
+
+function getResultArrays(result) {
+  return {
+    matches: result.matches,
+    missing: result.missing,
+    extra: result.extra
+  };
+}
+
+function renderManualComparison(result) {
+  const arrays = getResultArrays(result);
+  const hasExecutedResult = result.executed;
+
+  Object.entries(arrays).forEach(([key, values]) => {
+    const panel = $(`[data-result-panel="${key}"]`);
+    const list = $(`[data-result-list="${key}"]`);
+    const count = $(`[data-result-count="${key}"]`);
+    const copyButton = $(`[data-copy-result="${key}"]`);
+
+    panel.classList.remove("is-blocked", "is-stale", "is-empty");
+    count.textContent = hasExecutedResult ? String(values.length) : "—";
+    copyButton.disabled = !hasExecutedResult || values.length === 0;
+
+    if (!hasExecutedResult) {
+      panel.classList.add("is-blocked");
+      list.textContent = "No hay un resultado válido para mostrar.";
+      return;
+    }
+
+    if (values.length === 0) {
+      panel.classList.add("is-empty");
+      list.textContent = "Sin IDs en este conjunto.";
+      return;
+    }
+
+    list.textContent = values.join("\n");
+  });
+
+  const { backoffice, manual } = result.metrics;
+  $("#manual-metrics").textContent =
+    `A — ${backoffice.originalEntries} entradas · ${backoffice.validUnique} IDs únicos · ` +
+    `${backoffice.duplicates} duplicados · ${backoffice.invalid} inválidos | ` +
+    `B — ${manual.originalEntries} entradas · ${manual.validUnique} IDs únicos · ` +
+    `${manual.duplicates} duplicados · ${manual.invalid} inválidos`;
+
+  const issues = [
+    ...result.warnings.map(({ message }) => message),
+    backoffice.invalidValues.length
+      ? `Inválidos en A: ${backoffice.invalidValues.join(", ")}`
+      : "",
+    manual.invalidValues.length
+      ? `Inválidos en B: ${manual.invalidValues.join(", ")}`
+      : "",
+    backoffice.duplicateValues.length
+      ? `Duplicados en A: ${backoffice.duplicateValues.join(", ")}`
+      : "",
+    manual.duplicateValues.length
+      ? `Duplicados en B: ${manual.duplicateValues.join(", ")}`
+      : ""
+  ].filter(Boolean);
+
+  $("#manual-issues").textContent = issues.length
+    ? issues.join(" · ")
+    : "Sin advertencias.";
+}
+
+function invalidateManualComparison(message) {
+  if (!lastComparisonInput) return;
+
+  manualComparisonResult = null;
+  renderManualState("stale", message);
+  $("#manual-compare-summary").textContent =
+    `${message} Pulsa «Comparar listas» para actualizar.`;
+  lastComparisonInput = null;
+}
+
+function clearManualComparison() {
+  lastComparisonInput = null;
+  manualComparisonResult = null;
+  renderManualState("initial", "Aún no se ha ejecutado una comparación.");
+}
+
+function renderManualState(stateName, message) {
+  ["matches", "missing", "extra"].forEach((key) => {
+    const panel = $(`[data-result-panel="${key}"]`);
+    const list = $(`[data-result-list="${key}"]`);
+    const count = $(`[data-result-count="${key}"]`);
+    const copyButton = $(`[data-copy-result="${key}"]`);
+
+    panel.classList.remove("is-blocked", "is-stale", "is-empty");
+    if (stateName === "stale") panel.classList.add("is-stale");
+    if (stateName === "initial") panel.classList.add("is-blocked");
+    count.textContent = "—";
+    list.textContent = message;
+    copyButton.disabled = true;
+  });
+
+  $("#manual-metrics").textContent = "";
+  $("#manual-issues").textContent = "";
+  $("#manual-compare-summary").textContent = message;
+}
+
+function applyBackofficeStorage(value) {
+  state.backoffice = Array.isArray(value?.records)
+    ? value.records
+    : [];
+  state.backofficeStatus = value?.comparisonStatus ?? {
+    available: false
+  };
+  invalidateManualComparison(
+    state.backofficeStatus.failed
+      ? "La extracción de BackOffice falló y los resultados anteriores fueron invalidados."
+      : "La extracción de BackOffice cambió y los resultados anteriores quedaron desactualizados."
+  );
+  renderTable("backoffice");
+  buildComparison();
 }
 
 function renderAll() {
@@ -233,6 +360,7 @@ function renderAll() {
   renderTable("vendor");
   renderVendorMeta();
   buildComparison();
+  renderManualState("initial", "Aún no se ha ejecutado una comparación.");
 }
 
 function showView(view) {
@@ -401,28 +529,41 @@ $("#compare-manual-ids").addEventListener("click", () => {
   compareManualIds();
 });
 
-$("#clear-manual-ids").addEventListener("click", () => {
-  $("#manual-ids-b").value = "";
-  $("#confirm-empty-manual-ids").checked = false;
-  $("#manual-compare-summary").textContent = "";
-  $("#json-matches").value = "[]";
-  $("#json-missing-a").value = "[]";
-  $("#json-extra").value = "[]";
+$("#manual-ids-b").addEventListener("input", () => {
+  invalidateManualComparison("La lista manual cambió.");
 });
 
-document.querySelectorAll("[data-copy-json]").forEach((button) => {
-  button.addEventListener("click", async () => {
-    const fields = {
-      matches: "#json-matches",
-      missing: "#json-missing-a",
-      extra: "#json-extra"
-    };
-    try {
-      await navigator.clipboard.writeText($(fields[button.dataset.copyJson]).value);
-      $("#status").textContent = "Lista JSON copiada al portapapeles.";
-    } catch {
-      $("#status").textContent = "No se pudo copiar el JSON. Comprueba los permisos del portapapeles.";
-    }
+$("#clear-manual-ids").addEventListener("click", () => {
+  $("#manual-ids-b").value = "";
+  clearManualComparison();
+});
+
+function getResultValues(key) {
+  if (!manualComparisonResult?.executed) return null;
+  return manualComparisonResult[key];
+}
+
+async function copyResult(key) {
+  const values = getResultValues(key);
+
+  if (!values || values.length === 0) {
+    $("#status").textContent = "No hay IDs para copiar en este conjunto.";
+    return;
+  }
+
+  try {
+    await navigator.clipboard.writeText(values.join("\n"));
+    $("#status").textContent =
+      `Se copiaron ${values.length} IDs de ${resultLabels[key]}.`;
+  } catch {
+    $("#status").textContent =
+      "No se pudo copiar la lista. Comprueba los permisos del portapapeles.";
+  }
+}
+
+document.querySelectorAll("[data-copy-result]").forEach((button) => {
+  button.addEventListener("click", () => {
+    copyResult(button.dataset.copyResult);
   });
 });
 
@@ -453,9 +594,24 @@ async function init() {
     definitions[requestedView] ? requestedView : "backoffice"
   );
 
+  const status = state.backofficeStatus;
+  const backofficeMessage = status.failed
+    ? "La última extracción de BackOffice falló."
+    : status.partial
+      ? "BackOffice disponible con extracción parcial."
+      : status.complete
+        ? "BackOffice disponible con extracción completa."
+        : "BackOffice aún no está disponible.";
   $("#status").textContent =
-    `${state.backoffice.length} registros de BackOffice y ` +
-    `${state.vendor.length} registros de Vendor disponibles.`;
+    `${backofficeMessage} ${state.vendor.length} registros de Vendor disponibles.`;
+
+  chrome.storage.onChanged.addListener((changes, areaName) => {
+    if (areaName !== "session" || !changes.backofficeRecords) return;
+    applyBackofficeStorage(changes.backofficeRecords.newValue);
+    $("#status").textContent = state.backofficeStatus.failed
+      ? "La extracción de BackOffice falló; vuelve a ejecutarla."
+      : "La extracción de BackOffice se actualizó.";
+  });
 }
 
 init().catch(() => {

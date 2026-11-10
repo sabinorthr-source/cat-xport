@@ -31,7 +31,25 @@ async function extract(sourceName) {
     ? "Extrayendo Vendors de forma secuencial. No cierres la pestaña..."
     : "Leyendo los registros visibles de BackOffice...";
 
+  const extractionStartedAt = new Date().toISOString();
+
   try {
+    if (sourceName === "backoffice") {
+      await chrome.storage.session.set({
+        [config.storageKey]: {
+          records: [],
+          comparisonStatus: {
+            available: false,
+            complete: false,
+            partial: false,
+            failed: false,
+            state: "running",
+            startedAt: extractionStartedAt
+          }
+        }
+      });
+    }
+
     const [tab] = await chrome.tabs.query({
       active: true,
       currentWindow: true
@@ -76,8 +94,26 @@ async function extract(sourceName) {
       throw new Error("La página no devolvió registros válidos.");
     }
 
+    const storedResult = sourceName === "backoffice"
+      ? {
+          ...result,
+          comparisonStatus: {
+            available: true,
+            complete: false,
+            partial: true,
+            failed: false,
+            state: "partial",
+            startedAt: extractionStartedAt,
+            extractedAt: result.extractedAt,
+            recordCount: result.records.length,
+            message:
+              "Se capturaron los registros visibles; la cobertura total del catálogo no está demostrada."
+          }
+        }
+      : result;
+
     await chrome.storage.session.set({
-      [config.storageKey]: result
+      [config.storageKey]: storedResult
     });
 
     const dashboardUrl = chrome.runtime.getURL(
@@ -91,6 +127,28 @@ async function extract(sourceName) {
 
     window.close();
   } catch (error) {
+    if (sourceName === "backoffice") {
+      try {
+        await chrome.storage.session.set({
+          [config.storageKey]: {
+            records: [],
+            comparisonStatus: {
+              available: false,
+              complete: false,
+              partial: false,
+              failed: true,
+              state: "failed",
+              startedAt: extractionStartedAt,
+              failedAt: new Date().toISOString(),
+              message: error.message || "No se pudo completar la extracción."
+            }
+          }
+        });
+      } catch {
+        // Preserve the original extraction error for the popup.
+      }
+    }
+
     status.textContent =
       error.message || "No se pudo completar la extracción.";
 

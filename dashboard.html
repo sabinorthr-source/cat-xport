@@ -43,7 +43,7 @@
           <p class="eyebrow">PEDIDOSYA / DATA TOOLS</p>
           <h1 id="page-title">BackOffice</h1>
           <p id="page-description">
-            Registros extraídos del catálogo.
+            
           </p>
         </div>
         <span class="local-badge">Local</span>
@@ -92,29 +92,53 @@
             <div>
               <label class="field-label" for="manual-ids-b">Pega la lista de IDs</label>
               <textarea id="manual-ids-b" rows="6" placeholder='["1234", "1235", "1236"]'></textarea>
-              <label class="field-label">
-                <input id="confirm-empty-manual-ids" type="checkbox">
-                Confirmo que la lista manual está vacía
-              </label>
             </div>
           </div>
           <div class="toolbar manual-toolbar">
             <button id="compare-manual-ids" class="button primary" type="button">Comparar listas</button>
             <button id="clear-manual-ids" class="button secondary" type="button">Limpiar</button>
           </div>
-          <div id="manual-compare-summary" class="manual-summary" role="status" aria-live="polite"></div>
+          <div id="manual-compare-summary" class="manual-summary" role="status" aria-live="polite">
+            Aún no se ha ejecutado una comparación.
+          </div>
+          <div id="manual-metrics" class="manual-metrics" aria-live="polite"></div>
+          <div id="manual-issues" class="manual-issues" role="status" aria-live="polite"></div>
           <div class="json-results-grid">
-            <section class="json-result panelc">
-              <div class="json-result-heading"><h3>Coincidencias</h3><button class="button secondary" data-copy-json="matches">Copiar JSON</button></div>
-              <textarea id="json-matches" rows="8" readonly spellcheck="false">[]</textarea>
+            <section class="json-result result-panel panelc" data-result-panel="matches" aria-labelledby="matches-title">
+              <div class="json-result-heading">
+                <div>
+                  <h3 id="matches-title">Coincidencias</h3>
+                </div>
+                <strong class="result-count" data-result-count="matches">—</strong>
+              </div>
+              <div class="result-actions">
+                <button class="button secondary" data-copy-result="matches" disabled>Copiar</button>
+              </div>
+              <pre class="result-list" data-result-list="matches">Aún no se ha ejecutado una comparación.</pre>
             </section>
-            <section class="json-result panelf">
-              <div class="json-result-heading"><h3>Nos faltan</h3><button class="button secondary" data-copy-json="missing">Copiar JSON</button></div>
-              <textarea id="json-missing-a" rows="8" readonly spellcheck="false">[]</textarea>
+            <section class="json-result result-panel panelf" data-result-panel="missing" aria-labelledby="missing-title">
+              <div class="json-result-heading">
+                <div>
+                  <h3 id="missing-title">Nos faltan</h3>
+                </div>
+                <strong class="result-count" data-result-count="missing">—</strong>
+              </div>
+              <div class="result-actions">
+                <button class="button secondary" data-copy-result="missing" disabled>Copiar</button>
+              </div>
+              <pre class="result-list" data-result-list="missing">Aún no se ha ejecutado una comparación.</pre>
             </section>
-            <section class="json-result panelc">
-              <div class="json-result-heading"><h3>Nos sobran</h3><button class="button secondary" data-copy-json="extra">Copiar JSON</button></div>
-              <textarea id="json-extra" rows="8" readonly spellcheck="false">[]</textarea>
+            <section class="json-result result-panel panelx" data-result-panel="extra" aria-labelledby="extra-title">
+              <div class="json-result-heading">
+                <div>
+                  <h3 id="extra-title">Nos sobran</h3>
+                </div>
+                <strong class="result-count" data-result-count="extra">—</strong>
+              </div>
+              <div class="result-actions">
+                <button class="button secondary" data-copy-result="extra" disabled>Copiar</button>
+              </div>
+              <pre class="result-list" data-result-list="extra">Aún no se ha ejecutado una comparación.</pre>
             </section>
           </div>
         </section>

@@ -1,8 +1,14 @@
 {
   "manifest_version": 3,
   "name": "PedidosYa Catalog Export",
-  "version": "2.3.0",
+  "version": "2.4.0",
   "description": "Extrae, compara y exporta localmente datos de BackOffice y Vendor.",
+  "icons": {
+    "16": "assets/logo.png",
+    "32": "assets/logo.png",
+    "48": "assets/logo.png",
+    "128": "assets/logo.png"
+  },
   "permissions": [
     "activeTab",
     "scripting",
@@ -10,6 +16,10 @@
   ],
   "action": {
     "default_title": "PedidosYa Catalog Export",
+    "default_icon": {
+      "16": "assets/logo.png",
+      "32": "assets/logo.png"
+    },
     "default_popup": "popup.html"
   }
 }

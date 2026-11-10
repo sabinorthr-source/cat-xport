@@ -102,11 +102,13 @@
 
   function parseManualInput(input) {
     if (Array.isArray(input)) {
+      const values = input.map((value) =>
+        typeof value === "string" ? value.trim() : value
+      );
       return {
-        values: input.map((value) =>
-          typeof value === "string" ? value.trim() : value
-        ),
-        empty: input.length === 0
+        values,
+        empty: values.length === 0 ||
+          values.every((value) => isBlank(value))
       };
     }
 
@@ -120,11 +122,13 @@
       const parsed = JSON.parse(source);
 
       if (Array.isArray(parsed)) {
+        const values = parsed.map((value) =>
+          typeof value === "string" ? value.trim() : value
+        );
         return {
-          values: parsed.map((value) =>
-            typeof value === "string" ? value.trim() : value
-          ),
-          empty: parsed.length === 0
+          values,
+          empty: values.length === 0 ||
+            values.every((value) => isBlank(value))
         };
       }
     } catch {

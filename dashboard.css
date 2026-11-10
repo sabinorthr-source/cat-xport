@@ -375,8 +375,7 @@ tbody tr:last-child td {
 }
 
 #manual-ids-a,
-#manual-ids-b,
-.json-result textarea {
+#manual-ids-b {
   display: block;
   width: 100%;
   min-height: 130px;
@@ -392,8 +391,7 @@ tbody tr:last-child td {
 }
 
 #manual-ids-a:focus-visible,
-#manual-ids-b:focus-visible,
-.json-result textarea:focus-visible {
+#manual-ids-b:focus-visible {
   outline: 2px solid #6099ff;
   outline-offset: 2px;
 }
@@ -406,16 +404,19 @@ tbody tr:last-child td {
   margin: 4px 0 12px;
   color: #596579;
   font-size: 12px;
-}
-
-.status-matched {
-  color: #237343;
   font-weight: 700;
 }
 
-.status-missing {
-  color: #bd2035;
-  font-weight: 700;
+.manual-metrics,
+.manual-issues {
+  margin: 8px 0;
+  color: #596579;
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+.manual-issues {
+  color: #8a5a00;
 }
 
 .manual-input-grid,
@@ -426,7 +427,7 @@ tbody tr:last-child td {
 }
 
 .json-results-grid {
-  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   margin-top: 14px;
 }
 
@@ -446,6 +447,10 @@ tbody tr:last-child td {
   background: #ffdf20;
 }
 
+.panelx {
+  background: #f3e8ff;
+}
+
 .json-result-heading {
   display: flex;
   align-items: center;
@@ -459,6 +464,58 @@ tbody tr:last-child td {
   font-size: 13px;
 }
 
+.json-result-heading p {
+  margin: 4px 0 0;
+  color: #596579;
+  font-size: 11px;
+  font-weight: 400;
+}
+
+.result-count {
+  min-width: 32px;
+  color: #202124;
+  font-size: 20px;
+  text-align: right;
+}
+
+.result-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px;
+  margin-bottom: 10px;
+}
+
+.result-list {
+  min-height: 170px;
+  max-height: 260px;
+  margin: 0;
+  overflow: auto;
+  padding: 12px;
+  border: 1px solid #d8dde6;
+  border-radius: 8px;
+  background: #fff;
+  color: #202124;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 12px;
+  line-height: 1.5;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+.result-panel.is-blocked .result-list,
+.result-panel.is-stale .result-list {
+  color: #8a5a00;
+}
+
+.result-panel.is-empty .result-list {
+  color: #596579;
+}
+
+.result-panel button:disabled {
+  cursor: not-allowed;
+  opacity: .55;
+}
+
 .json-result textarea {
   min-height: 170px;
   background: #fff;
@@ -468,9 +525,10 @@ tbody tr:last-child td {
 }
 
 @media (max-width: 900px) {
-  .json-results-grid { grid-template-columns: 1fr; }
+  .json-results-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }
 
 @media (max-width: 600px) {
   .manual-input-grid { grid-template-columns: 1fr; }
+  .json-results-grid { grid-template-columns: 1fr; }
 }
