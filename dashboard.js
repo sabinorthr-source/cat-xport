@@ -5,6 +5,7 @@ const state = {
   vendor: [],
   comparison: [],
   vendorMeta: null,
+  backofficeStatus: { available: false },
   manualComparison: []
 };
 
@@ -192,41 +193,39 @@ function buildComparison() {
   renderTable("comparison");
 }
 
-function extractNumericId(value) {
-  // Ignora texto o símbolos antes/después y compara únicamente la secuencia numérica.
-  const match = String(value ?? "").match(/\d+/);
-  return match ? match[0] : "";
-}
-
-function parseManualIdList(raw) {
-  const source = String(raw ?? "").trim();
-  if (!source) return [];
-
-  let values;
-  try {
-    const parsed = JSON.parse(source);
-    values = Array.isArray(parsed) ? parsed : [parsed];
-  } catch {
-    // Admite también IDs pegados en líneas separadas, separados por coma o punto y coma.
-    values = source.split(/[\s,;]+/).filter(Boolean);
-  }
-
-  return [...new Set(values.map(extractNumericId).filter(Boolean))];
-}
-
 function compareManualIds() {
-  const listA = [...new Set(state.backoffice.map((record) => extractNumericId(record.localId)).filter(Boolean))];
-  const listB = parseManualIdList($("#manual-ids-b").value);
-  const setA = new Set(listA);
-  const setB = new Set(listB);
-  const matches = listB.filter((id) => setA.has(id));
-  const missing = listB.filter((id) => !setA.has(id));
+  const result = IdComparator.compareIdLists({
+    backofficeRecords: state.backoffice,
+    manualInput: $("#manual-ids-b").value,
+    manualEmptyConfirmed: $("#confirm-empty-manual-ids").checked,
+    backofficeStatus: state.backofficeStatus
+  });
 
-  $("#json-matches").value = JSON.stringify(matches.map(Number), null, 2);
-  $("#json-missing-a").value = JSON.stringify(missing.map(Number), null, 2);
+  $("#json-matches").value = result.executed
+    ? JSON.stringify(result.matches, null, 2)
+    : "[]";
+  $("#json-missing-a").value = result.executed
+    ? JSON.stringify(result.missing, null, 2)
+    : "[]";
+  $("#json-extra").value = result.executed
+    ? JSON.stringify(result.extra, null, 2)
+    : "[]";
+
+  const { backoffice, manual } = result.metrics;
+  const metricsText =
+    `A: ${backoffice.originalEntries} entradas, ${backoffice.validUnique} únicos, ` +
+    `${backoffice.duplicates} duplicados, ${backoffice.invalid} inválidos · ` +
+    `B: ${manual.originalEntries} entradas, ${manual.validUnique} únicos, ` +
+    `${manual.duplicates} duplicados, ${manual.invalid} inválidos`;
+  const resultText = result.executed
+    ? ` · ${result.metrics.matches} coincidencias · ` +
+      `${result.metrics.missing} nos faltan · ${result.metrics.extra} nos sobran`
+    : ` · Comparación bloqueada: ${result.reason}`;
+
   $("#manual-compare-summary").textContent =
-    `Lista A (BackOffice): ${listA.length} IDs únicos · Lista ingresada: ${listB.length} IDs únicos · ` +
-    `${matches.length} coincidencias · ${missing.length} faltantes.`;
+    `${result.status}${result.partial ? " (PARCIAL)" : ""} · ` +
+    `${metricsText}${resultText} ` +
+    `${result.warnings.map(({ message }) => `[Aviso: ${message}]`).join(" ")}`;
 }
 
 function renderAll() {
@@ -404,14 +403,20 @@ $("#compare-manual-ids").addEventListener("click", () => {
 
 $("#clear-manual-ids").addEventListener("click", () => {
   $("#manual-ids-b").value = "";
+  $("#confirm-empty-manual-ids").checked = false;
   $("#manual-compare-summary").textContent = "";
   $("#json-matches").value = "[]";
   $("#json-missing-a").value = "[]";
+  $("#json-extra").value = "[]";
 });
 
 document.querySelectorAll("[data-copy-json]").forEach((button) => {
   button.addEventListener("click", async () => {
-    const fields = { matches: "#json-matches", missingA: "#json-missing-a" };
+    const fields = {
+      matches: "#json-matches",
+      missing: "#json-missing-a",
+      extra: "#json-extra"
+    };
     try {
       await navigator.clipboard.writeText($(fields[button.dataset.copyJson]).value);
       $("#status").textContent = "Lista JSON copiada al portapapeles.";
@@ -430,6 +435,9 @@ async function init() {
   state.backoffice = Array.isArray(saved.backofficeRecords?.records)
     ? saved.backofficeRecords.records
     : [];
+  state.backofficeStatus = saved.backofficeRecords?.comparisonStatus ?? {
+    available: false
+  };
 
   state.vendor = Array.isArray(saved.vendorRecords?.records)
     ? saved.vendorRecords.records

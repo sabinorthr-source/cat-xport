@@ -6,6 +6,7 @@
   <title>PedidosYa Catalog Export</title>
   <link rel="stylesheet" href="dashboard.css">
   <script src="vendor/xlsx.full.min.js"></script>
+  <script src="id-comparator.js"></script>
   <script src="dashboard.js" defer></script>
 </head>
 <body>
@@ -90,7 +91,11 @@
           <div class="manual-input-grid single-input">
             <div>
               <label class="field-label" for="manual-ids-b">Pega la lista de IDs</label>
-              <textarea id="manual-ids-b" rows="6" placeholder='["1234", "1235", 1236]'></textarea>
+              <textarea id="manual-ids-b" rows="6" placeholder='["1234", "1235", "1236"]'></textarea>
+              <label class="field-label">
+                <input id="confirm-empty-manual-ids" type="checkbox">
+                Confirmo que la lista manual está vacía
+              </label>
             </div>
           </div>
           <div class="toolbar manual-toolbar">
@@ -104,8 +109,12 @@
               <textarea id="json-matches" rows="8" readonly spellcheck="false">[]</textarea>
             </section>
             <section class="json-result panelf">
-              <div class="json-result-heading"><h3>Faltantes</h3><button class="button secondary" data-copy-json="missingA">Copiar JSON</button></div>
+              <div class="json-result-heading"><h3>Nos faltan</h3><button class="button secondary" data-copy-json="missing">Copiar JSON</button></div>
               <textarea id="json-missing-a" rows="8" readonly spellcheck="false">[]</textarea>
+            </section>
+            <section class="json-result panelc">
+              <div class="json-result-heading"><h3>Nos sobran</h3><button class="button secondary" data-copy-json="extra">Copiar JSON</button></div>
+              <textarea id="json-extra" rows="8" readonly spellcheck="false">[]</textarea>
             </section>
           </div>
         </section>
